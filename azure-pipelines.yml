@@ -1,17 +1,72 @@
 trigger:
 - main
 
-pool:
-  vmImage: ubuntu-latest
+variables:
+  azureSubscription: 'b41589e2-8822-4b92-865f-d00019119792' 
+  webappName: 'gs-spring'
+  vmImageName: 'ubuntu-latest'
 
-steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'app/pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+stages:
+- stage: Build
+  displayName: Code Build
+  jobs:
+  - job: MavenPackageAndPublishArtifacts
+    displayName: Generate and Publish Maven build artifacts.
+    pool:
+      vmImage: $(vmImageName)
+    
+    steps:
+      - task: Maven@3
+        displayName: Maven build
+        inputs:
+          mavenPomFile: 'app/pom.xml'
+          mavenOptions: '-Xmx3072m'
+          javaHomeOption: 'JDKVersion'
+          jdkVersionOption: '1.8'
+          jdkArchitectureOption: 'x64'
+          publishJUnitResults: true
+          testResultsFiles: '**/surefire-reports/TEST-*.xml'
+          goals: 'package'
+
+          
+      - task: CopyFiles@2
+        displayName: Copy files to artifact staging directory
+        inputs:
+          SourceFolder: '$(System.DefaultWorkingDirectory)'
+          Contents: '**/target/*.?(war|jar)'
+          TargetFolder: $(Build.ArtifactStagingDirectory)
+          
+      - task: PublishBuildArtifacts@1
+        displayName: Publish generated Maven build artifacts
+        inputs: 
+          targetPath: $(Build.ArtifactStagingDirectory)
+
+- stage: Deploy
+  displayName: Deployment
+  dependsOn: Build
+  condition: suceeded()
+  jobs:
+  - deployment: Deploy gs-spring webapp
+    displayName: Deploy gs-spring webapp to Azure webapp service
+    environment: 'stage'
+    pool:
+      vmImage: $(vmImageName)
+    strategy:
+     runOnce:
+       deploy:
+         steps:
+           - task: DownloadPipelineArtifact@1
+             displayName: 'Download build artifact for Deployment'
+             inputs: 
+              buildType: current
+              
+           - task: AzureWebApp@1
+             displayName: 'Azure Web App Deploy: gs-spring-boot'
+             inputs:
+               azureSubscription: 
+               appType: webAppLinux 
+               appName: $(webAppName)
+               package: '$(System.ArtifactsDirectory)/drop/**/target/*.?(war|jar)'
+
+
+
