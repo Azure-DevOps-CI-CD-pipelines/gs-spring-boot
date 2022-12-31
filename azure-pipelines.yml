@@ -2,7 +2,7 @@ trigger:
 - main
 
 variables:
-  azureSubscription: 'Free Trial' 
+  azureSubscription: 'java' 
   webappName: 'gs_spring'
   vmImageName: 'ubuntu-latest'
 
