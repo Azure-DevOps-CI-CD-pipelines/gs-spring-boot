@@ -55,11 +55,6 @@ stages:
      runOnce:
        deploy:
          steps:
-           - task: DownloadPipelineArtifact@1
-             displayName: 'Download build artifact for Deployment'
-             inputs: 
-              buildType: 'current'
-
            - task: AzureWebApp@1
              displayName: 'Azure Web App Deploy: gs-spring-boot'
              inputs:
