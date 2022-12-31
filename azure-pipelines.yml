@@ -44,7 +44,7 @@ stages:
 - stage: Deploy
   displayName: Deployment
   dependsOn: Build
-  condition: suceeded()
+  condition: succeeded()
   jobs:
   - deployment: Deploy gs-spring webapp
     displayName: Deploy gs-spring webapp to Azure webapp service
@@ -59,7 +59,7 @@ stages:
              displayName: 'Download build artifact for Deployment'
              inputs: 
               buildType: current
-              
+
            - task: AzureWebApp@1
              displayName: 'Azure Web App Deploy: gs-spring-boot'
              inputs:
