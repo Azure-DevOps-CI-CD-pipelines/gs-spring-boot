@@ -61,7 +61,7 @@ stages:
                azureSubscription: $(azureSubscription)
                appType: webAppLinux 
                appName: $(webAppName)
-               package: '$(Build.ArtifactStagingDirectory)/app/target/*.?(war|jar)'
+               package: '$(Build.ArtifactStagingDirectory)/app/target/*.jar'
 
 
 
