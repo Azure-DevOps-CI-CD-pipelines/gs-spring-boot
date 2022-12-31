@@ -46,7 +46,7 @@ stages:
   dependsOn: Build
   condition: succeeded()
   jobs:
-  - deployment: Deploy gs-spring webapp
+  - deployment: DeployLinuxWebApp
     displayName: Deploy gs-spring webapp to Azure webapp service
     environment: 'stage'
     pool:
