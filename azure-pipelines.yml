@@ -3,7 +3,7 @@ trigger:
 
 variables:
   azureSubscription: 'b41589e2-8822-4b92-865f-d00019119792' 
-  webappName: 'gs-spring'
+  webappName: 'gs_spring'
   vmImageName: 'ubuntu-latest'
 
 stages:
